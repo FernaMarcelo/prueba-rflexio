@@ -1,49 +1,101 @@
-# My Docker Project
+# 🚀 CI/CD para Backend Laravel con GitHub Actions + AWS ECS
 
-This project demonstrates a simple setup using Docker to containerize a basic web application.
+Este repositorio implementa una solución completa de CI/CD (Integración y Despliegue Continuo) utilizando **GitHub Actions**, **Docker**, **Amazon ECR/ECS** y **SonarCloud** para una aplicación Laravel.
 
-## Project Structure
+---
 
-```
-my-docker-project
-├── Dockerfile
-├── index.html
-├── .github
-│   └── workflows
-│       └── pipeline.yml
-└── README.md
-```
+## 📦 Características principales
 
-## Getting Started
+- Validación automática de código mediante **tests unitarios**.
+- Propongo utilizar "SonarCloud" para el análisis de calidad de código con **SonarCloud**.
+- Construcción de imágenes Docker optimizadas.
+- Push automático a **Amazon ECR**.
+- Despliegue continuo sobre **Amazon ECS (Fargate)**.
+- Compatible con ramas `main` y `staging`.
 
-To build and run this project using Docker, follow the instructions below.
+---
 
-### Prerequisites
+## 🧰 Requisitos previos
 
-- Docker installed on your machine.
+### 📁 Estructura esperada del proyecto
 
-### Building the Docker Image
+El repositorio debe contener:
 
-Navigate to the project directory and run the following command to build the Docker image:
+- Un proyecto Laravel funcional (`composer.json`, `artisan`, `/tests`)
+- Un `Dockerfile` válido para construir la app
+- Un archivo `.env.example` con las variables necesarias
 
-```
-docker build -t my-docker-project .
-```
+### 🔐 GitHub Secrets requeridos
 
-### Running the Docker Container
+Estos secretos se deben reemplazar con las KEY pertenecientes a AWS rFlex.io:
 
-After building the image, you can run the container with the following command:
+| Clave | Descripción |
+|------|-------------|
+| `AWS_ACCESS_KEY_ID` | Access Key de tu IAM user |
+| `AWS_SECRET_ACCESS_KEY` | Secret Key del IAM user |
+| `SONAR_TOKEN` | Token de proyecto SonarCloud para análisis de código |
 
-```
-docker run -p 8080:80 my-docker-project
-```
+---
 
-You can then access the application by navigating to `http://localhost:8080` in your web browser.
+## ⚙️ Pipeline CI/CD paso a paso
 
-## GitHub Actions
+### 1. `test` – Validación del código
 
-This project includes a GitHub Actions workflow located in `.github/workflows/pipeline.yml`. This workflow automates the testing and deployment process.
+Se ejecuta en `pull_request` y `push` sobre `main` o `staging`.
 
-## Contributing
+**Acciones realizadas:**
+- Instalación de dependencias con Composer.
+- Copia de variables `.env.example` → `.env`.
+- Generación de clave con `php artisan key:generate`.
+- Ejecución de pruebas con `php artisan test`.
 
-Feel free to submit issues or pull requests for any improvements or features you would like to see in this project.
+✅ **Objetivo:** Asegurar que el código nuevo no rompa la funcionalidad existente.
+
+---
+
+### 2. `sonarcloud-check` – Análisis de calidad
+
+Se ejecuta solo si los tests pasan exitosamente.
+
+**Acciones realizadas:**
+- Análisis de código estático usando SonarCloud.
+
+✅ **Objetivo:** Detectar código duplicado, deuda técnica, vulnerabilidades y problemas de estilo.
+
+---
+
+### 3. `build-and-push` – Construcción de la imagen Docker
+
+Se ejecuta si pasa el análisis de SonarCloud.
+
+**Acciones realizadas:**
+- Login a Amazon ECR.
+- Construcción de la imagen Docker con tag `github.sha`.
+- Push de la imagen al repositorio ECR definido (`rfex-backend`).
+
+✅ **Objetivo:** Asegurar una imagen reproducible y versionada para deploy.
+
+---
+
+### 4. `deploy` – Despliegue en AWS ECS
+
+Se ejecuta al finalizar correctamente el build de Docker.
+
+**Acciones realizadas:**
+- Llamada a `aws ecs update-service` con `--force-new-deployment` para reiniciar el contenedor con la nueva imagen.
+
+✅ **Objetivo:** Desplegar automáticamente en ECS (Fargate o EC2) sin tiempos muertos.
+
+---
+
+## 🔁 Flujo general
+
+```mermaid
+graph TD
+  A[Push o Pull Request] --> B[Run Tests]
+  B --> C[SonarCloud Analysis]
+  C --> D[Build & Push Docker Image]
+  D --> E[Deploy to ECS]
+
+
+Este proceso está pensado para que una vez se tengan las key necesarias se peuda desplegar para dar continuidad a los problemas vistos y que el codigo pase por un proceso de validación y no se realice de manera manual, ya que el problema más grande que noté es la falta de un ambiente QA antes de pasar a producción. Teniendo las keys de AWS y las herramientas propuestas calzan perfecto para tener un sistema robusto.
