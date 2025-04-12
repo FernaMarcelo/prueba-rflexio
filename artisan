@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+
+echo "rflexio artisan entry point.\n";
