@@ -1,4 +1,4 @@
-# 🚀 CI/CD para Backend Laravel con GitHub Actions + AWS ECS
+# 🚀 CI/CD para rFlex.io Backend Laravel con GitHub Actions + AWS ECS
 
 Este repositorio implementa una solución completa de CI/CD (Integración y Despliegue Continuo) utilizando **GitHub Actions**, **Docker**, **Amazon ECR/ECS** y **SonarCloud** para una aplicación Laravel.
 
