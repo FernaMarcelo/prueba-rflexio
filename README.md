@@ -96,11 +96,8 @@ graph TD
   B --> C[SonarCloud Analysis]
   C --> D[Build & Push Docker Image]
   D --> E[Deploy to ECS]
-
+```
 ---
 
 ### `Conclusión`
-Este proceso está pensado para que una vez se tengan las key necesarias se peuda desplegar 
-para dar continuidad a los problemas vistos y que el codigo pase por un proceso de validación 
-y no se realice de manera manual, ya que el problema más grande que noté es la falta de un ambiente QA 
-antes de pasar a producción. Teniendo las keys de AWS y las herramientas propuestas calzan perfecto para tener un sistema robusto.
+Este proceso está pensado para que una vez se tengan las key necesarias se peuda desplegar para dar continuidad a los problemas vistos y que el codigo pase por un proceso de validación y no se realice de manera manual, ya que el problema más grande que noté es la falta de un ambiente QA antes de pasar a producción. Teniendo las keys de AWS y las herramientas propuestas calzan perfecto para tener un sistema robusto.
